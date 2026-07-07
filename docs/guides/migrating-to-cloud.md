@@ -31,7 +31,7 @@ The API is identical. Every existing method works the same way. Your code doesn'
 
 ## Getting Your API Key
 
-1. Sign up at [engramma-memory.dev/signup](https://engramma-memory.dev/signup)
+1. Sign up at [engramma-memory.com/signup](https://www.engramma-memory.com/signup)
 2. Create a project in the dashboard
 3. Copy your API key:
     - `nx_live_...` — production (persistent, billed)

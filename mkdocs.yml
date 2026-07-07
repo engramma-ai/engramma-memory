@@ -1,8 +1,8 @@
 site_name: Engramma Memory
-site_url: https://docs.engramma-memory.dev
+site_url: https://doc.engramma-memory.com
 site_description: A composable memory engine for AI systems that learns, adapts, and reasons.
-repo_url: https://github.com/engramma-memory/engramma-memory
-repo_name: engramma-memory/engramma-memory
+repo_url: https://github.com/engramma-ai/engramma-memory
+repo_name: engramma-ai/engramma-memory
 
 theme:
   name: material
@@ -72,6 +72,6 @@ plugins:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/engramma-memory/engramma-memory
+      link: https://github.com/engramma-ai/engramma-memory
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/engramma-memory/

@@ -8,8 +8,8 @@
     <a href="https://pypi.org/project/engramma-memory/"><img src="https://img.shields.io/pypi/v/engramma-memory?style=for-the-badge&color=5A67D8" alt="PyPI" /></a>
     <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.9+-5A67D8?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.9+" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License: MIT" /></a>
-    <a href="https://github.com/engramma-memory/engramma-memory/actions"><img src="https://img.shields.io/badge/tests-39%20passed-brightgreen?style=for-the-badge" alt="Tests" /></a>
-    <a href="https://docs.engramma-memory.dev"><img src="https://img.shields.io/badge/docs-engramma--memory.dev-blue?style=for-the-badge" alt="Docs" /></a>
+    <a href="https://github.com/engramma-ai/engramma-memory/actions"><img src="https://img.shields.io/badge/tests-39%20passed-brightgreen?style=for-the-badge" alt="Tests" /></a>
+    <a href="https://doc.engramma-memory.com"><img src="https://img.shields.io/badge/docs-engramma--memory.dev-blue?style=for-the-badge" alt="Docs" /></a>
   </p>
 
   <h4>
@@ -17,7 +17,7 @@
     <a href="#-why-engramma">Why Engramma?</a> &nbsp;&bull;&nbsp;
     <a href="#-how-it-works">Architecture</a> &nbsp;&bull;&nbsp;
     <a href="#%E2%98%81%EF%B8%8F-engramma-cloud">Cloud</a> &nbsp;&bull;&nbsp;
-    <a href="https://docs.engramma-memory.dev">Documentation</a>
+    <a href="https://doc.engramma-memory.com">Documentation</a>
   </h4>
 </div>
 
@@ -232,7 +232,7 @@ mem = EngrammaMemory(dim=256, backend="cloud", api_key="nx_live_...")
 ```
 
 > [!IMPORTANT]
-> **[Get Your Free API Key →](https://engramma-memory.dev/signup)**
+> **[Get Your Free API Key →](https://www.engramma-memory.com/signup)**
 
 ### What Cloud Unlocks
 
@@ -305,7 +305,7 @@ async with EngrammaMemoryAsync(dim=256, backend="cloud", api_key="...") as mem:
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ```bash
-git clone https://github.com/engramma-memory/engramma-memory.git
+git clone https://github.com/engramma-ai/engramma-memory.git
 cd engramma-memory
 pip install -e ".[dev]"
 pytest  # 39 tests, all green
@@ -316,12 +316,12 @@ pytest  # 39 tests, all green
 <div align="center">
   <h2>Ready for production?</h2>
   <p><strong>Local is free forever.</strong> When you hit the wall — 1000 patterns, no persistence, no causal reasoning — Cloud is one line away.</p>
-  <a href="https://engramma-memory.dev/signup"><img src="https://img.shields.io/badge/Start%20Free%20%E2%86%92-5A67D8?style=for-the-badge" alt="Start Free" /></a>
+  <a href="https://www.engramma-memory.com/signup"><img src="https://img.shields.io/badge/Start%20Free%20%E2%86%92-5A67D8?style=for-the-badge" alt="Start Free" /></a>
   <br/><br/>
   <p>
     MIT License &bull; 
-    <a href="https://docs.engramma-memory.dev">Documentation</a> &bull; 
-    <a href="https://github.com/engramma-memory/engramma-memory">GitHub</a> &bull; 
-    <a href="https://github.com/engramma-memory/engramma-memory/issues">Issues</a>
+    <a href="https://doc.engramma-memory.com">Documentation</a> &bull; 
+    <a href="https://github.com/engramma-ai/engramma-memory">GitHub</a> &bull; 
+    <a href="https://github.com/engramma-ai/engramma-memory/issues">Issues</a>
   </p>
 </div>

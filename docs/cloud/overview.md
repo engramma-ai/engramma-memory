@@ -365,7 +365,7 @@ metrics = mem.analytics(period="24h")
 
 ## Getting Started with Cloud
 
-1. **Sign up** at [engramma-memory.dev/signup](https://engramma-memory.dev/signup)
+1. **Sign up** at [engramma-memory.com/signup](https://www.engramma-memory.com/signup)
 2. **Get your key** (starts with `nx_live_` or `nx_test_`)
 3. **One-line switch:**
 ```python

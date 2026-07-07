@@ -54,7 +54,7 @@ Install only what you need:
 ## Development Install
 
 ```bash
-git clone https://github.com/engramma-memory/engramma-memory.git
+git clone https://github.com/engramma-ai/engramma-memory.git
 cd engramma-memory
 pip install -e ".[dev]"
 ```

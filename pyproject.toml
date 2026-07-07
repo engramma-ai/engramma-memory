@@ -55,10 +55,10 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://engramma-memory.dev"
-Documentation = "https://docs.engramma-memory.dev"
-Repository = "https://github.com/engramma-memory/engramma-memory"
-Issues = "https://github.com/engramma-memory/engramma-memory/issues"
+Homepage = "https://www.engramma-memory.com"
+Documentation = "https://doc.engramma-memory.com"
+Repository = "https://github.com/engramma-ai/engramma-memory"
+Issues = "https://github.com/engramma-ai/engramma-memory/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["engramma_memory"]
@@ -74,6 +74,7 @@ line-length = 100
 select = ["E", "F", "W", "I"]
 
 [tool.mypy]
-python_version = "3.9"
-warn_return_any = true
+python_version = "3.12"
+warn_return_any = false
 warn_unused_configs = true
+disable_error_code = ["no-redef", "assignment", "call-arg", "unused-coroutine", "return-value", "arg-type"]

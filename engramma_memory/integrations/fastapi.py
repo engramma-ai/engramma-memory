@@ -12,16 +12,17 @@ Usage:
     memory_router = create_memory_router(dim=256)
     app.include_router(memory_router, prefix="/memory")
 """
-from typing import Optional, List, Dict, Any
+
+from typing import List, Optional
 
 import numpy as np
 
 from ..core import EngrammaMemory
 
 
-def create_memory_router(dim: int = 256, backend: str = "local",
-                         api_key: Optional[str] = None,
-                         embed_fn=None):
+def create_memory_router(
+    dim: int = 256, backend: str = "local", api_key: Optional[str] = None, embed_fn=None
+):
     """
     Create a FastAPI router with Engramma memory endpoints.
 
@@ -101,10 +102,7 @@ def create_memory_router(dim: int = 256, backend: str = "local",
 
         results = engramma.query(q, top_k=req.top_k)
         return {
-            "results": [
-                {"value": r["value"].tolist(), "score": float(r["score"])}
-                for r in results
-            ]
+            "results": [{"value": r["value"].tolist(), "score": float(r["score"])} for r in results]
         }
 
     @router.post("/compose")
@@ -143,6 +141,7 @@ def _default_embed_factory(dim: int):
         rng = np.random.default_rng(hash(text) % (2**32))
         vec = rng.standard_normal(dim).astype(np.float32)
         return vec / (np.linalg.norm(vec) + 1e-8)
+
     return embed
 
 
@@ -159,8 +158,7 @@ class EngrammaMiddleware:
             result = mem.query(embedding, top_k=5)
     """
 
-    def __init__(self, app, dim: int = 256, backend: str = "local",
-                 api_key: Optional[str] = None):
+    def __init__(self, app, dim: int = 256, backend: str = "local", api_key: Optional[str] = None):
         self.app = app
         self._engramma = EngrammaMemory(dim=dim, backend=backend, api_key=api_key)
 

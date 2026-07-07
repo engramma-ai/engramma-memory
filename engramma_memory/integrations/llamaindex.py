@@ -9,16 +9,17 @@ Usage:
     retriever = EngrammaRetriever(dim=256, top_k=5)
     query_engine = RetrieverQueryEngine(retriever=retriever)
 """
-from typing import List, Optional, Any
+
+from typing import Any, List, Optional
 
 import numpy as np
 
 from ..core import EngrammaMemory
 
-
 try:
     from llama_index.core.retrievers import BaseRetriever
-    from llama_index.core.schema import NodeWithScore, TextNode, QueryBundle
+    from llama_index.core.schema import NodeWithScore, QueryBundle, TextNode
+
     _HAS_LLAMAINDEX = True
 except ImportError:
     _HAS_LLAMAINDEX = False
@@ -57,9 +58,15 @@ class EngrammaRetriever(BaseRetriever):
         API key for cloud backend.
     """
 
-    def __init__(self, dim: int = 256, top_k: int = 5,
-                 embed_fn=None, backend: str = "local",
-                 api_key: Optional[str] = None, **kwargs):
+    def __init__(
+        self,
+        dim: int = 256,
+        top_k: int = 5,
+        embed_fn=None,
+        backend: str = "local",
+        api_key: Optional[str] = None,
+        **kwargs,
+    ):
         if not _HAS_LLAMAINDEX:
             raise ImportError(
                 "LlamaIndex integration requires llama-index-core. "
@@ -85,9 +92,9 @@ class EngrammaRetriever(BaseRetriever):
         if self._engramma.count == 0:
             return []
 
-        if hasattr(query_bundle, 'embedding') and query_bundle.embedding is not None:
+        if hasattr(query_bundle, "embedding") and query_bundle.embedding is not None:
             query_emb = np.asarray(query_bundle.embedding, dtype=np.float32)
-        elif self._embed_fn and hasattr(query_bundle, 'query_str'):
+        elif self._embed_fn and hasattr(query_bundle, "query_str"):
             query_emb = self._embed_fn(query_bundle.query_str)
         else:
             return []
@@ -113,9 +120,8 @@ class EngrammaRetriever(BaseRetriever):
     def _find_closest_text(self, value: np.ndarray) -> Optional[int]:
         if not self._embeddings:
             return None
-        value = value.flatten()[:self._dim]
-        dists = [np.linalg.norm(e.flatten()[:self._dim] - value)
-                 for e in self._embeddings]
+        value = value.flatten()[: self._dim]
+        dists = [np.linalg.norm(e.flatten()[: self._dim] - value) for e in self._embeddings]
         best = int(np.argmin(dists))
         return best if dists[best] < 2.0 else None
 
@@ -128,8 +134,7 @@ class EngrammaVectorStore:
     ChromaVectorStore or FaissVectorStore.
     """
 
-    def __init__(self, dim: int = 256, backend: str = "local",
-                 api_key: Optional[str] = None):
+    def __init__(self, dim: int = 256, backend: str = "local", api_key: Optional[str] = None):
         self._engramma = EngrammaMemory(dim=dim, backend=backend, api_key=api_key)
         self._dim = dim
         self._nodes: List[Any] = []
@@ -137,11 +142,11 @@ class EngrammaVectorStore:
     def add(self, nodes: List[Any]) -> List[str]:
         ids = []
         for node in nodes:
-            if hasattr(node, 'embedding') and node.embedding is not None:
+            if hasattr(node, "embedding") and node.embedding is not None:
                 emb = np.asarray(node.embedding, dtype=np.float32)
                 self._engramma.store(key=emb, value=emb)
                 self._nodes.append(node)
-                ids.append(getattr(node, 'node_id', str(len(self._nodes))))
+                ids.append(getattr(node, "node_id", str(len(self._nodes))))
         return ids
 
     def query(self, query_embedding: List[float], top_k: int = 5) -> List[Any]:

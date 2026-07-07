@@ -9,7 +9,8 @@ Usage:
     memory = EngrammaCrewMemory(dim=256)
     # Use with CrewAI agents
 """
-from typing import Optional, List, Dict, Any
+
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 
@@ -35,8 +36,9 @@ class EngrammaCrewMemory:
         API key for cloud backend.
     """
 
-    def __init__(self, dim: int = 256, embed_fn=None,
-                 backend: str = "local", api_key: Optional[str] = None):
+    def __init__(
+        self, dim: int = 256, embed_fn=None, backend: str = "local", api_key: Optional[str] = None
+    ):
         self._dim = dim
         self._embed_fn = embed_fn or self._default_embed
         self._engramma = EngrammaMemory(dim=dim, backend=backend, api_key=api_key)
@@ -61,10 +63,12 @@ class EngrammaCrewMemory:
             if r["score"] > 0.2:
                 text = self._find_text(r["value"])
                 if text:
-                    memories.append({
-                        "content": text,
-                        "score": r["score"],
-                    })
+                    memories.append(
+                        {
+                            "content": text,
+                            "score": r["score"],
+                        }
+                    )
         return memories
 
     def compose_context(self, queries: List[str]) -> str:
@@ -90,12 +94,12 @@ class EngrammaCrewMemory:
     def _find_text(self, value: np.ndarray) -> Optional[str]:
         if not self._texts:
             return None
-        value = value.flatten()[:self._dim]
-        best_dist = float('inf')
+        value = value.flatten()[: self._dim]
+        best_dist = float("inf")
         best_text = None
         for text in self._texts:
             emb = self._embed_fn(text)
-            dist = float(np.linalg.norm(emb.flatten()[:self._dim] - value))
+            dist = float(np.linalg.norm(emb.flatten()[: self._dim] - value))
             if dist < best_dist:
                 best_dist = dist
                 best_text = text

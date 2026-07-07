@@ -14,8 +14,8 @@ Async:
     >>> await mem.store(key=embedding, value=data)
 """
 
-from .core import EngrammaMemory
 from .async_core import EngrammaMemoryAsync
+from .core import EngrammaMemory
 
 __version__ = "0.1.0"
 __all__ = ["EngrammaMemory", "EngrammaMemoryAsync"]

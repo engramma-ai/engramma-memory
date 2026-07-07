@@ -4,13 +4,14 @@ Local backend for Engramma Memory.
 Runs entirely in-process, zero network calls, sub-millisecond latency.
 Limited to max_patterns (default 1000) with RAM-only storage.
 """
+
 import warnings
+from typing import Any, Dict, List, Optional
+
 import numpy as np
 from numpy.typing import NDArray
-from typing import Optional, List, Dict, Any
 
 from ..engine import EngrammaEngine
-
 
 _LIMIT_WARNING_THRESHOLD = 0.9
 _MAX_PATTERNS_LOCAL = 1000
@@ -25,8 +26,8 @@ class LocalBackend:
                 f"Local backend is limited to {_MAX_PATTERNS_LOCAL} patterns. "
                 f"For unlimited storage, use Engramma Cloud: "
                 f"EngrammaMemory(backend='cloud', api_key='nx_...')\n"
-                f"Get your free API key: https://engramma-memory.dev/signup",
-                stacklevel=3
+                f"Get your free API key: https://www.engramma-memory.com/signup",
+                stacklevel=3,
             )
             max_patterns = _MAX_PATTERNS_LOCAL
 
@@ -41,7 +42,7 @@ class LocalBackend:
         self._check_capacity()
 
     def query(self, query: NDArray, top_k: int = 1) -> List[Dict[str, Any]]:
-        query = np.asarray(query, dtype=np.float32).flatten()[:self.dim]
+        query = np.asarray(query, dtype=np.float32).flatten()[: self.dim]
 
         if top_k == 1:
             result, confidence = self.engine.exact.retrieve(query)
@@ -64,9 +65,9 @@ class LocalBackend:
 
     def _to_array(self, value: Any) -> NDArray:
         if isinstance(value, np.ndarray):
-            return value.flatten()[:self.dim].astype(np.float32)
+            return value.flatten()[: self.dim].astype(np.float32)
         if isinstance(value, (list, tuple)):
-            return np.array(value, dtype=np.float32).flatten()[:self.dim]
+            return np.array(value, dtype=np.float32).flatten()[: self.dim]
         return np.zeros(self.dim, dtype=np.float32)
 
     def _check_capacity(self):
@@ -75,14 +76,14 @@ class LocalBackend:
             self._warned_capacity = True
             count = self.engine.exact.count
             warnings.warn(
-                f"\n{'='*60}\n"
+                f"\n{'=' * 60}\n"
                 f"  EngrammaMemory: {count}/{self.max_patterns} patterns used ({usage:.0%})\n"
                 f"  You're approaching the local storage limit.\n"
                 f"\n"
                 f"  For unlimited patterns + persistence + smart eviction:\n"
                 f"    mem = EngrammaMemory(backend='cloud', api_key='nx_...')\n"
                 f"\n"
-                f"  Get your free API key: https://engramma-memory.dev/signup\n"
-                f"{'='*60}",
-                stacklevel=4
+                f"  Get your free API key: https://www.engramma-memory.com/signup\n"
+                f"{'=' * 60}",
+                stacklevel=4,
             )

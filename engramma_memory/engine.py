@@ -8,10 +8,12 @@ Hybrid architecture combining:
 
 All learning is LOCAL. No GPU required. Sub-millisecond retrieval.
 """
+
 import logging
+from typing import Dict, List, Optional, Tuple
+
 import numpy as np
 from numpy.typing import NDArray
-from typing import Tuple, Optional, Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +35,8 @@ class ExactMemory:
         self.ops_count = 0
 
     def store(self, key: NDArray, value: NDArray):
-        key = key.flatten()[:self.key_dim].astype(np.float32)
-        value = value.flatten()[:self.value_dim].astype(np.float32)
+        key = key.flatten()[: self.key_dim].astype(np.float32)
+        value = value.flatten()[: self.value_dim].astype(np.float32)
 
         if self.n > 0:
             active_idx = np.where(self.active)[0]
@@ -51,7 +53,7 @@ class ExactMemory:
             idx = self.n
         else:
             scores = self._importance_scores()
-            scores[~self.active] = float('inf')
+            scores[~self.active] = float("inf")
             idx = int(np.argmin(scores))
 
         self.keys[idx] = key
@@ -66,7 +68,7 @@ class ExactMemory:
         if self.n == 0:
             return np.zeros(self.value_dim, dtype=np.float32), 0.0
 
-        query = query.flatten()[:self.key_dim].astype(np.float32)
+        query = query.flatten()[: self.key_dim].astype(np.float32)
         active_idx = np.where(self.active)[0]
         dists = np.linalg.norm(self.keys[active_idx] - query, axis=1)
         best_local = int(np.argmin(dists))
@@ -89,7 +91,7 @@ class ExactMemory:
         if self.n == 0:
             return []
 
-        query = query.flatten()[:self.key_dim].astype(np.float32)
+        query = query.flatten()[: self.key_dim].astype(np.float32)
         active_idx = np.where(self.active)[0]
         dists = np.linalg.norm(self.keys[active_idx] - query, axis=1)
         top_k_local = np.argsort(dists)[:k]
@@ -114,8 +116,7 @@ class ExactMemory:
 class EnergyMemory:
     """Energy-based memory with temperature-scaled softmax retrieval."""
 
-    def __init__(self, key_dim: int, value_dim: int, max_patterns: int = 1000,
-                 beta: float = 4.0):
+    def __init__(self, key_dim: int, value_dim: int, max_patterns: int = 1000, beta: float = 4.0):
         self.key_dim = key_dim
         self.value_dim = value_dim
         self.max_patterns = max_patterns
@@ -128,8 +129,8 @@ class EnergyMemory:
         self.n = 0
 
     def store(self, key: NDArray, value: NDArray):
-        key = key.flatten()[:self.key_dim].astype(np.float32)
-        value = value.flatten()[:self.value_dim].astype(np.float32)
+        key = key.flatten()[: self.key_dim].astype(np.float32)
+        value = value.flatten()[: self.value_dim].astype(np.float32)
         key_norm = key / (np.linalg.norm(key) + 1e-8)
 
         if self.n < self.max_patterns:
@@ -148,7 +149,7 @@ class EnergyMemory:
         if self.n == 0:
             return np.zeros(self.value_dim, dtype=np.float32), 0.0
 
-        query = query.flatten()[:self.key_dim].astype(np.float32)
+        query = query.flatten()[: self.key_dim].astype(np.float32)
         query_norm = query / (np.linalg.norm(query) + 1e-8)
 
         active_idx = np.where(self.active)[0]
@@ -201,8 +202,8 @@ class MultiHeadAttentionMemory:
         self.head_weights = np.ones(n_heads, dtype=np.float32) / n_heads
 
     def store(self, key: NDArray, value: NDArray):
-        key = key.flatten()[:self.dim].astype(np.float32)
-        value = value.flatten()[:self.dim].astype(np.float32)
+        key = key.flatten()[: self.dim].astype(np.float32)
+        value = value.flatten()[: self.dim].astype(np.float32)
 
         if self.n < self.max_patterns:
             idx = self.n
@@ -217,7 +218,7 @@ class MultiHeadAttentionMemory:
         if self.n == 0:
             return np.zeros(self.dim, dtype=np.float32), 0.0
 
-        query = query.flatten()[:self.dim].astype(np.float32)
+        query = query.flatten()[: self.dim].astype(np.float32)
         n = min(self.n, self.max_patterns)
         stored_keys = self.keys[:n]
         stored_values = self.values[:n]
@@ -250,8 +251,8 @@ class MultiHeadAttentionMemory:
         if self.n == 0:
             return np.zeros(self.dim, dtype=np.float32), 0.0
 
-        query_a = query_a.flatten()[:self.dim].astype(np.float32)
-        query_b = query_b.flatten()[:self.dim].astype(np.float32)
+        query_a = query_a.flatten()[: self.dim].astype(np.float32)
+        query_b = query_b.flatten()[: self.dim].astype(np.float32)
         n = min(self.n, self.max_patterns)
         stored_keys = self.keys[:n]
         stored_values = self.values[:n]
@@ -305,9 +306,7 @@ class ConfidenceRouter:
 
     def update(self, pathway_idx: int, confidence: float):
         lr = 0.05
-        self.success_ema[pathway_idx] = (
-            (1 - lr) * self.success_ema[pathway_idx] + lr * confidence
-        )
+        self.success_ema[pathway_idx] = (1 - lr) * self.success_ema[pathway_idx] + lr * confidence
 
 
 class EngrammaEngine:
@@ -324,8 +323,7 @@ class EngrammaEngine:
     that vector databases cannot achieve.
     """
 
-    def __init__(self, dim: int, max_patterns: int = 1000, beta: float = 4.0,
-                 n_heads: int = 4):
+    def __init__(self, dim: int, max_patterns: int = 1000, beta: float = 4.0, n_heads: int = 4):
         self.dim = dim
         self.max_patterns = max_patterns
 
@@ -336,15 +334,15 @@ class EngrammaEngine:
         self.n_stored = 0
 
     def store(self, key: NDArray, value: NDArray):
-        key = np.asarray(key, dtype=np.float32).flatten()[:self.dim]
-        value = np.asarray(value, dtype=np.float32).flatten()[:self.dim]
+        key = np.asarray(key, dtype=np.float32).flatten()[: self.dim]
+        value = np.asarray(value, dtype=np.float32).flatten()[: self.dim]
         self.exact.store(key, value)
         self.energy.store(key, value)
         self.attention.store(key, value)
         self.n_stored += 1
 
     def retrieve(self, query: NDArray) -> NDArray:
-        query = np.asarray(query, dtype=np.float32).flatten()[:self.dim]
+        query = np.asarray(query, dtype=np.float32).flatten()[: self.dim]
 
         exact_result, exact_conf = self.exact.retrieve(query)
 
@@ -360,13 +358,11 @@ class EngrammaEngine:
             return alpha * exact_result + (1 - alpha) * energy_result
 
         weights = self.router.route(exact_conf, energy_conf, attn_conf)
-        result = (weights[0] * exact_result +
-                  weights[1] * energy_result +
-                  weights[2] * attn_result)
+        result = weights[0] * exact_result + weights[1] * energy_result + weights[2] * attn_result
         return result
 
     def retrieve_top_k(self, query: NDArray, k: int = 5) -> List[Tuple[NDArray, float]]:
-        query = np.asarray(query, dtype=np.float32).flatten()[:self.dim]
+        query = np.asarray(query, dtype=np.float32).flatten()[: self.dim]
         return self.exact.retrieve_top_k(query, k)
 
     def compose(self, keys: List[NDArray], weights: Optional[List[float]] = None) -> NDArray:
@@ -381,19 +377,20 @@ class EngrammaEngine:
                 return self.retrieve(keys[0])
             return np.zeros(self.dim, dtype=np.float32)
 
-        keys_arr = [np.asarray(k, dtype=np.float32).flatten()[:self.dim] for k in keys]
+        keys_arr = [np.asarray(k, dtype=np.float32).flatten()[: self.dim] for k in keys]
 
         if weights is not None:
             # Local version: only 50/50 blend supported
             w = np.array(weights, dtype=np.float32)
             if not np.allclose(w, w[0]):
                 import warnings
+
                 warnings.warn(
                     "Weighted composition is limited in the local version. "
                     "All weights will be treated as equal. "
                     "For custom weights, upgrade to Engramma Cloud: "
                     "mem = EngrammaMemory(backend='cloud', api_key='nx_...')",
-                    stacklevel=2
+                    stacklevel=2,
                 )
 
         if len(keys_arr) == 2:
@@ -412,7 +409,7 @@ class EngrammaEngine:
 
     def forget(self, key: NDArray, strategy: str = "decay"):
         """Remove or decay a pattern from memory."""
-        key = np.asarray(key, dtype=np.float32).flatten()[:self.dim]
+        key = np.asarray(key, dtype=np.float32).flatten()[: self.dim]
 
         if strategy == "immediate":
             active_idx = np.where(self.exact.active)[0]

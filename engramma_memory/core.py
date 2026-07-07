@@ -3,9 +3,11 @@ EngrammaMemory - The public API.
 
 One interface, two backends. Switching from local to cloud is one line.
 """
+
+from typing import Any, Dict, List, Optional, Union
+
 import numpy as np
 from numpy.typing import NDArray
-from typing import Optional, List, Dict, Any, Union
 
 
 class EngrammaMemory:
@@ -19,7 +21,7 @@ class EngrammaMemory:
     backend : str
         "local" (default, free, open source) or "cloud" (production, paid).
     api_key : str, optional
-        Required for cloud backend. Get yours at https://engramma-memory.dev/signup
+        Required for cloud backend. Get yours at https://www.engramma-memory.com/signup
     max_patterns : int, optional
         Maximum stored patterns. Local is capped at 1000.
     **kwargs
@@ -36,35 +38,42 @@ class EngrammaMemory:
     >>> mem = EngrammaMemory(dim=256, backend="cloud", api_key="nx_live_...")
     """
 
-    def __init__(self, dim: int, backend: str = "local",
-                 api_key: Optional[str] = None,
-                 max_patterns: int = 1000,
-                 **kwargs):
+    def __init__(
+        self,
+        dim: int,
+        backend: str = "local",
+        api_key: Optional[str] = None,
+        max_patterns: int = 1000,
+        **kwargs,
+    ):
         self.dim = dim
         self.backend_name = backend
 
         if backend == "local":
             from .backends.local import LocalBackend
+
             self._backend = LocalBackend(dim=dim, max_patterns=max_patterns, **kwargs)
 
         elif backend == "cloud":
             if not api_key:
                 raise ValueError(
                     "Cloud backend requires an API key.\n"
-                    "Get your free key: https://engramma-memory.dev/signup\n"
+                    "Get your free key: https://www.engramma-memory.com/signup\n"
                     "Usage: EngrammaMemory(dim=256, backend='cloud', api_key='nx_live_...')"
                 )
             from .backends.cloud import CloudBackend
+
             self._backend = CloudBackend(dim=dim, api_key=api_key, **kwargs)
 
         else:
-            raise ValueError(
-                f"Unknown backend '{backend}'. Use 'local' or 'cloud'."
-            )
+            raise ValueError(f"Unknown backend '{backend}'. Use 'local' or 'cloud'.")
 
-    def store(self, key: Union[NDArray, List[float]],
-              value: Union[NDArray, List[float], Any],
-              metadata: Optional[Dict] = None) -> None:
+    def store(
+        self,
+        key: Union[NDArray, List[float]],
+        value: Union[NDArray, List[float], Any],
+        metadata: Optional[Dict] = None,
+    ) -> None:
         """
         Store a key-value pair in memory.
 
@@ -78,15 +87,15 @@ class EngrammaMemory:
             Additional metadata (cloud backend only).
         """
         key = np.asarray(key, dtype=np.float32)
-        if hasattr(self._backend, 'store'):
+        if hasattr(self._backend, "store"):
             if metadata and self.backend_name == "cloud":
                 self._backend.store(key, value, metadata=metadata)
             else:
                 self._backend.store(key, value)
 
-    def query(self, query: Union[NDArray, List[float]],
-              top_k: int = 1,
-              filters: Optional[Dict] = None) -> List[Dict[str, Any]]:
+    def query(
+        self, query: Union[NDArray, List[float]], top_k: int = 1, filters: Optional[Dict] = None
+    ) -> List[Dict[str, Any]]:
         """
         Query memory for the most relevant stored patterns.
 
@@ -129,8 +138,9 @@ class EngrammaMemory:
         query = np.asarray(query, dtype=np.float32)
         return self._backend.retrieve(query)
 
-    def compose(self, keys: List[Union[NDArray, List[float]]],
-                weights: Optional[List[float]] = None) -> NDArray:
+    def compose(
+        self, keys: List[Union[NDArray, List[float]]], weights: Optional[List[float]] = None
+    ) -> NDArray:
         """
         Compose multiple stored patterns into a blended result.
 
@@ -154,8 +164,7 @@ class EngrammaMemory:
         keys_arr = [np.asarray(k, dtype=np.float32) for k in keys]
         return self._backend.compose(keys_arr, weights)
 
-    def forget(self, key: Union[NDArray, List[float]],
-               strategy: str = "decay") -> None:
+    def forget(self, key: Union[NDArray, List[float]], strategy: str = "decay") -> None:
         """
         Remove or decay a pattern from memory.
 
@@ -180,7 +189,4 @@ class EngrammaMemory:
         return s.get("exact_count", s.get("n_stored", 0))
 
     def __repr__(self) -> str:
-        return (
-            f"EngrammaMemory(dim={self.dim}, backend='{self.backend_name}', "
-            f"count={self.count})"
-        )
+        return f"EngrammaMemory(dim={self.dim}, backend='{self.backend_name}', count={self.count})"

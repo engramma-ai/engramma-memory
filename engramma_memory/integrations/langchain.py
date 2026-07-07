@@ -9,15 +9,16 @@ Usage:
     memory = EngrammaLangChainMemory(dim=256)
     chain = ConversationChain(llm=llm, memory=memory)
 """
-from typing import Dict, List, Any, Optional
+
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 
 from ..core import EngrammaMemory
 
-
 try:
     from langchain_core.memory import BaseMemory
+
     _HAS_LANGCHAIN = True
 except ImportError:
     _HAS_LANGCHAIN = False
@@ -55,10 +56,17 @@ class EngrammaLangChainMemory(BaseMemory):
     memory_key: str = "history"
     input_key: str = "input"
 
-    def __init__(self, dim: int = 256, memory_key: str = "history",
-                 input_key: str = "input", embed_fn=None,
-                 backend: str = "local", api_key: Optional[str] = None,
-                 top_k: int = 5, **kwargs):
+    def __init__(
+        self,
+        dim: int = 256,
+        memory_key: str = "history",
+        input_key: str = "input",
+        embed_fn=None,
+        backend: str = "local",
+        api_key: Optional[str] = None,
+        top_k: int = 5,
+        **kwargs,
+    ):
         if not _HAS_LANGCHAIN:
             raise ImportError(
                 "LangChain integration requires langchain-core. "
@@ -91,7 +99,7 @@ class EngrammaLangChainMemory(BaseMemory):
                 if i < len(self._buffer):
                     relevant.append(self._buffer[-(i + 1)])
 
-        return {self._memory_key: "\n".join(relevant[-self._top_k:])}
+        return {self._memory_key: "\n".join(relevant[-self._top_k :])}
 
     def save_context(self, inputs: Dict[str, Any], outputs: Dict[str, str]) -> None:
         input_text = inputs.get(self._input_key, "")

@@ -16,8 +16,9 @@ Usage:
     # In your assistant loop:
     result = handler.handle(tool_name, arguments)
 """
+
 import json
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 
@@ -35,87 +36,102 @@ def engramma_tool_definitions() -> List[Dict[str, Any]]:
             "type": "function",
             "function": {
                 "name": "engramma_store",
-                "description": "Store information in long-term memory for later retrieval. Use this to remember facts, context, or user preferences.",
+                "description": (
+                    "Store information in long-term memory"
+                    " for later retrieval. Use this to remember"
+                    " facts, context, or user preferences."
+                ),
                 "parameters": {
                     "type": "object",
                     "properties": {
                         "content": {
                             "type": "string",
-                            "description": "The content/information to store in memory."
+                            "description": "The content/information to store in memory.",
                         },
                         "category": {
                             "type": "string",
-                            "description": "Optional category tag (e.g., 'user_preference', 'fact', 'context').",
-                            "enum": ["user_preference", "fact", "context", "conversation", "task"]
-                        }
+                            "description": (
+                                "Optional category tag"
+                                " (e.g., 'user_preference',"
+                                " 'fact', 'context')."
+                            ),
+                            "enum": ["user_preference", "fact", "context", "conversation", "task"],
+                        },
                     },
-                    "required": ["content"]
-                }
-            }
+                    "required": ["content"],
+                },
+            },
         },
         {
             "type": "function",
             "function": {
                 "name": "engramma_query",
-                "description": "Search long-term memory for relevant information. Use this to recall stored facts or context.",
+                "description": (
+                    "Search long-term memory for relevant information."
+                    " Use this to recall stored facts or context."
+                ),
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "query": {
-                            "type": "string",
-                            "description": "What to search for in memory."
-                        },
+                        "query": {"type": "string", "description": "What to search for in memory."},
                         "top_k": {
                             "type": "integer",
                             "description": "Number of results to return (default: 3).",
-                            "default": 3
-                        }
+                            "default": 3,
+                        },
                     },
-                    "required": ["query"]
-                }
-            }
+                    "required": ["query"],
+                },
+            },
         },
         {
             "type": "function",
             "function": {
                 "name": "engramma_compose",
-                "description": "Compose/blend multiple memories together. Useful for combining related concepts or creating a synthesized view.",
+                "description": (
+                    "Compose/blend multiple memories together."
+                    " Useful for combining related concepts"
+                    " or creating a synthesized view."
+                ),
                 "parameters": {
                     "type": "object",
                     "properties": {
                         "queries": {
                             "type": "array",
                             "items": {"type": "string"},
-                            "description": "List of memory queries to compose together."
+                            "description": "List of memory queries to compose together.",
                         }
                     },
-                    "required": ["queries"]
-                }
-            }
+                    "required": ["queries"],
+                },
+            },
         },
         {
             "type": "function",
             "function": {
                 "name": "engramma_forget",
-                "description": "Remove or decay a specific memory. Use when information is outdated or user requests deletion.",
+                "description": (
+                    "Remove or decay a specific memory."
+                    " Use when information is outdated"
+                    " or user requests deletion."
+                ),
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "query": {
-                            "type": "string",
-                            "description": "The memory to forget."
-                        },
+                        "query": {"type": "string", "description": "The memory to forget."},
                         "strategy": {
                             "type": "string",
                             "enum": ["decay", "immediate"],
-                            "description": "How to forget: 'decay' (gradual) or 'immediate' (delete now).",
-                            "default": "decay"
-                        }
+                            "description": (
+                                "How to forget: 'decay' (gradual) or 'immediate' (delete now)."
+                            ),
+                            "default": "decay",
+                        },
                     },
-                    "required": ["query"]
-                }
-            }
-        }
+                    "required": ["query"],
+                },
+            },
+        },
     ]
 
 
@@ -135,8 +151,9 @@ class EngrammaToolHandler:
         API key for cloud backend.
     """
 
-    def __init__(self, dim: int = 256, embed_fn=None,
-                 backend: str = "local", api_key: Optional[str] = None):
+    def __init__(
+        self, dim: int = 256, embed_fn=None, backend: str = "local", api_key: Optional[str] = None
+    ):
         self._dim = dim
         self._embed_fn = embed_fn or self._default_embed
         self._engramma = EngrammaMemory(dim=dim, backend=backend, api_key=api_key)
@@ -216,12 +233,12 @@ class EngrammaToolHandler:
     def _find_text(self, value: np.ndarray) -> Optional[str]:
         if not self._text_store:
             return None
-        value = value.flatten()[:self._dim]
-        best_dist = float('inf')
+        value = value.flatten()[: self._dim]
+        best_dist = float("inf")
         best_text = None
         for idx, text in self._text_store.items():
             emb = self._embed_fn(text)
-            dist = float(np.linalg.norm(emb.flatten()[:self._dim] - value))
+            dist = float(np.linalg.norm(emb.flatten()[: self._dim] - value))
             if dist < best_dist:
                 best_dist = dist
                 best_text = text

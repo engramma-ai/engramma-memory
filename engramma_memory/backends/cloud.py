@@ -18,16 +18,17 @@ Production-grade memory engine powered by NEXUSCompose v4 (Phases 1-10):
     - Temporal causality & predictive prefetch
     - Text interface & XAI dashboard
 """
-import time
+
 import logging
+import time
+from typing import Any, Dict, List, Optional
+
 import numpy as np
 from numpy.typing import NDArray
-from typing import Optional, List, Dict, Any
-
 
 logger = logging.getLogger(__name__)
 
-_CLOUD_API_BASE = "https://api.engramma-memory.dev/v1"
+_CLOUD_API_BASE = "https://api.engramma-memory.com/v1"
 _MAX_RETRIES = 3
 _BACKOFF_BASE = 0.5
 
@@ -35,12 +36,18 @@ _BACKOFF_BASE = 0.5
 class CloudBackend:
     """Engramma Cloud backend - production-grade memory engine (v4)."""
 
-    def __init__(self, dim: int, api_key: str, endpoint: Optional[str] = None,
-                 max_retries: int = _MAX_RETRIES, timeout: float = 30.0,
-                 **kwargs):
+    def __init__(
+        self,
+        dim: int,
+        api_key: str,
+        endpoint: Optional[str] = None,
+        max_retries: int = _MAX_RETRIES,
+        timeout: float = 30.0,
+        **kwargs,
+    ):
         if not api_key or not api_key.startswith("nx_"):
             raise ValueError(
-                "Invalid API key. Get your key at: https://engramma-memory.dev/signup\n"
+                "Invalid API key. Get your key at: https://www.engramma-memory.com/signup\n"
                 "Keys start with 'nx_live_' (production) or 'nx_test_' (sandbox)."
             )
 
@@ -53,6 +60,7 @@ class CloudBackend:
 
         try:
             import httpx
+
             self._client = httpx.Client(
                 base_url=self.endpoint,
                 headers={
@@ -66,6 +74,7 @@ class CloudBackend:
         except ImportError:
             try:
                 import requests
+
                 self._client = None
                 self._requests = requests
                 self._headers = {
@@ -93,9 +102,13 @@ class CloudBackend:
             payload["metadata"] = metadata
         self._post("/memory/store", payload)
 
-    def query(self, query: NDArray, top_k: int = 1,
-              filters: Optional[Dict] = None,
-              use_phi_b: bool = False) -> List[Dict[str, Any]]:
+    def query(
+        self,
+        query: NDArray,
+        top_k: int = 1,
+        filters: Optional[Dict] = None,
+        use_phi_b: bool = False,
+    ) -> List[Dict[str, Any]]:
         """
         Query memory with optional phi_B geometric routing (Phase 2).
 
@@ -122,12 +135,11 @@ class CloudBackend:
             "mode": "active_inference",
         }
         response = self._post("/memory/retrieve", payload)
-        return np.array(response.get("result", np.zeros(self.dim).tolist()),
-                        dtype=np.float32)
+        return np.array(response.get("result", np.zeros(self.dim).tolist()), dtype=np.float32)
 
-    def compose(self, keys: List[NDArray],
-                weights: Optional[List[float]] = None,
-                mode: str = "attention") -> NDArray:
+    def compose(
+        self, keys: List[NDArray], weights: Optional[List[float]] = None, mode: str = "attention"
+    ) -> NDArray:
         """
         Weighted composition with multiple HDC modes (Phase 2+6).
 
@@ -149,8 +161,7 @@ class CloudBackend:
         if weights is not None:
             payload["weights"] = weights
         response = self._post("/memory/compose", payload)
-        return np.array(response.get("result", np.zeros(self.dim).tolist()),
-                        dtype=np.float32)
+        return np.array(response.get("result", np.zeros(self.dim).tolist()), dtype=np.float32)
 
     def forget(self, key: NDArray, strategy: str = "decay") -> None:
         payload = {
@@ -191,9 +202,9 @@ class CloudBackend:
         """
         return self._get(f"/neuromodulation/surprise_history?window={window}")
 
-    def configure_neuromodulation(self, baseline: float = 0.5,
-                                  sensitivity: float = 2.0,
-                                  tau: float = 10.0) -> Dict[str, Any]:
+    def configure_neuromodulation(
+        self, baseline: float = 0.5, sensitivity: float = 2.0, tau: float = 10.0
+    ) -> Dict[str, Any]:
         """
         Fine-tune the plasticity gate parameters.
 
@@ -206,11 +217,14 @@ class CloudBackend:
         tau : float
             Decay time constant for returning to baseline.
         """
-        return self._post("/neuromodulation/configure", {
-            "baseline": baseline,
-            "sensitivity": sensitivity,
-            "tau": tau,
-        })
+        return self._post(
+            "/neuromodulation/configure",
+            {
+                "baseline": baseline,
+                "sensitivity": sensitivity,
+                "tau": tau,
+            },
+        )
 
     # ═══════════════════════════════════════════════════════════════════
     # PHASE 2 — PHI_B GEOMETRIC ROUTING
@@ -255,10 +269,9 @@ class CloudBackend:
     # PHASE 3 — EFE STRATEGIC ROUTING
     # ═══════════════════════════════════════════════════════════════════
 
-    def query_with_epistemic_weight(self, query: NDArray,
-                                    epistemic_w: float = 1.0,
-                                    pragmatic_w: float = 0.5,
-                                    top_k: int = 1) -> List[Dict[str, Any]]:
+    def query_with_epistemic_weight(
+        self, query: NDArray, epistemic_w: float = 1.0, pragmatic_w: float = 0.5, top_k: int = 1
+    ) -> List[Dict[str, Any]]:
         """
         Query with explicit exploration/exploitation tradeoff.
 
@@ -320,9 +333,9 @@ class CloudBackend:
         """
         return self._get("/stdp/temperatures")
 
-    def enable_stdp_learning(self, enabled: bool = True,
-                             eta: float = 0.01,
-                             tau: float = 5.0) -> Dict[str, Any]:
+    def enable_stdp_learning(
+        self, enabled: bool = True, eta: float = 0.01, tau: float = 5.0
+    ) -> Dict[str, Any]:
         """
         Configure STDP temporal plasticity.
 
@@ -335,11 +348,14 @@ class CloudBackend:
         tau : float
             Time window (in operations) for co-activation detection.
         """
-        return self._post("/stdp/configure", {
-            "enabled": enabled,
-            "eta": eta,
-            "tau": tau,
-        })
+        return self._post(
+            "/stdp/configure",
+            {
+                "enabled": enabled,
+                "eta": eta,
+                "tau": tau,
+            },
+        )
 
     def get_head_activation_timeline(self, window: int = 50) -> Dict[str, Any]:
         """
@@ -376,8 +392,7 @@ class CloudBackend:
     # PHASE 6 — ADVANCED COMPOSITION & CAUSAL GRAPH
     # ═══════════════════════════════════════════════════════════════════
 
-    def compose_fractional(self, key_a: NDArray, key_b: NDArray,
-                           alpha: float = 0.5) -> NDArray:
+    def compose_fractional(self, key_a: NDArray, key_b: NDArray, alpha: float = 0.5) -> NDArray:
         """
         Continuous interpolation between two stored patterns.
 
@@ -395,8 +410,7 @@ class CloudBackend:
             "alpha": alpha,
         }
         response = self._post("/memory/compose_fractional", payload)
-        return np.array(response.get("result", np.zeros(self.dim).tolist()),
-                        dtype=np.float32)
+        return np.array(response.get("result", np.zeros(self.dim).tolist()), dtype=np.float32)
 
     def get_causal_graph(self) -> Dict[str, Any]:
         """
@@ -411,8 +425,7 @@ class CloudBackend:
         """
         return self._get("/causal/graph")
 
-    def predict_causal_effect(self, cause_key: NDArray,
-                              effect_key: NDArray) -> Dict[str, Any]:
+    def predict_causal_effect(self, cause_key: NDArray, effect_key: NDArray) -> Dict[str, Any]:
         """
         Predict: "If I perturb pattern A, what happens to pattern B?"
 
@@ -432,8 +445,9 @@ class CloudBackend:
         }
         return self._post("/causal/strength", payload)
 
-    def is_confounded(self, key_a: NDArray, key_b: NDArray,
-                      threshold: float = 0.5) -> Dict[str, Any]:
+    def is_confounded(
+        self, key_a: NDArray, key_b: NDArray, threshold: float = 0.5
+    ) -> Dict[str, Any]:
         """
         Detect whether A↔B association is driven by a hidden confounder.
 
@@ -575,8 +589,7 @@ class CloudBackend:
         """
         return self._post("/safety/anomaly_protection", {"enabled": enabled})
 
-    def set_regime_thresholds(self, theta_b: float = 1.0,
-                              theta_c: float = 2.0) -> Dict[str, Any]:
+    def set_regime_thresholds(self, theta_b: float = 1.0, theta_c: float = 2.0) -> Dict[str, Any]:
         """
         Configure when to enter cautious (B) and anomaly (C) regimes.
 
@@ -587,10 +600,13 @@ class CloudBackend:
         theta_c : float
             KL threshold for entering Regime C (anomaly/lockdown).
         """
-        return self._post("/safety/set_thresholds", {
-            "theta_b": theta_b,
-            "theta_c": theta_c,
-        })
+        return self._post(
+            "/safety/set_thresholds",
+            {
+                "theta_b": theta_b,
+                "theta_c": theta_c,
+            },
+        )
 
     def consolidate(self) -> Dict[str, Any]:
         """
@@ -620,8 +636,9 @@ class CloudBackend:
     # PHASE 9 — TEMPORAL CAUSALITY & PREFETCH
     # ═══════════════════════════════════════════════════════════════════
 
-    def test_granger_causality(self, key_a: NDArray, key_b: NDArray,
-                               max_lag: int = 10) -> Dict[str, Any]:
+    def test_granger_causality(
+        self, key_a: NDArray, key_b: NDArray, max_lag: int = 10
+    ) -> Dict[str, Any]:
         """
         Test temporal Granger causality between two patterns.
 
@@ -642,8 +659,7 @@ class CloudBackend:
         }
         return self._post("/temporal/granger_test", payload)
 
-    def get_causal_predictions(self, query: NDArray,
-                               n_predictions: int = 3) -> Dict[str, Any]:
+    def get_causal_predictions(self, query: NDArray, n_predictions: int = 3) -> Dict[str, Any]:
         """
         Predict which patterns will be accessed next.
 
@@ -715,8 +731,9 @@ class CloudBackend:
 
     # --- Text Interface (HDC Tokenizer) ---
 
-    def store_text(self, text: str, value_embedding: Optional[NDArray] = None,
-                   metadata: Optional[Dict] = None) -> None:
+    def store_text(
+        self, text: str, value_embedding: Optional[NDArray] = None, metadata: Optional[Dict] = None
+    ) -> None:
         """
         Store semantic text (auto-encoded to HDC representation).
 
@@ -736,8 +753,9 @@ class CloudBackend:
             payload["metadata"] = metadata
         self._post("/memory/store_text", payload)
 
-    def query_text(self, query_text: str, top_k: int = 5,
-                   filters: Optional[Dict] = None) -> List[Dict[str, Any]]:
+    def query_text(
+        self, query_text: str, top_k: int = 5, filters: Optional[Dict] = None
+    ) -> List[Dict[str, Any]]:
         """
         Query memory by natural language text.
 
@@ -752,8 +770,9 @@ class CloudBackend:
         response = self._post("/memory/query_text", payload)
         return response.get("results", [])
 
-    def compose_text(self, texts: List[str],
-                     weights: Optional[List[float]] = None) -> Dict[str, Any]:
+    def compose_text(
+        self, texts: List[str], weights: Optional[List[float]] = None
+    ) -> Dict[str, Any]:
         """
         Compose blends of semantic text patterns.
 
@@ -767,8 +786,7 @@ class CloudBackend:
     def get_text_encoding(self, text: str) -> NDArray:
         """Inspect the HDC encoding of a text string."""
         response = self._post("/text/encode", {"text": text})
-        return np.array(response.get("encoding", np.zeros(self.dim).tolist()),
-                        dtype=np.float32)
+        return np.array(response.get("encoding", np.zeros(self.dim).tolist()), dtype=np.float32)
 
     # --- Explainability (XAI) ---
 
@@ -893,19 +911,19 @@ class CloudBackend:
                             url, json=json, headers=self._headers, timeout=self.timeout
                         )
                     else:
-                        resp = self._requests.get(
-                            url, headers=self._headers, timeout=self.timeout
-                        )
+                        resp = self._requests.get(url, headers=self._headers, timeout=self.timeout)
                     resp.raise_for_status()
                     return resp.json()
             except Exception as exc:
                 last_exc = exc
                 if attempt < self.max_retries - 1:
-                    wait = _BACKOFF_BASE * (2 ** attempt)
+                    wait = _BACKOFF_BASE * (2**attempt)
                     logger.warning(
-                        "Engramma Cloud request failed (attempt %d/%d), "
-                        "retrying in %.1fs: %s",
-                        attempt + 1, self.max_retries, wait, exc
+                        "Engramma Cloud request failed (attempt %d/%d), retrying in %.1fs: %s",
+                        attempt + 1,
+                        self.max_retries,
+                        wait,
+                        exc,
                     )
                     time.sleep(wait)
         raise ConnectionError(

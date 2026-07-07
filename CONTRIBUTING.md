@@ -5,7 +5,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 ## Development Setup
 
 ```bash
-git clone https://github.com/engramma-memory/engramma-memory.git
+git clone https://github.com/engramma-ai/engramma-memory.git
 cd engramma-memory
 python -m venv .venv
 source .venv/bin/activate  # or .venv\Scripts\activate on Windows
@@ -67,7 +67,7 @@ The engine uses three pathways:
 
 ## Reporting Issues
 
-Please use [GitHub Issues](https://github.com/engramma-memory/engramma-memory/issues) and include:
+Please use [GitHub Issues](https://github.com/engramma-ai/engramma-memory/issues) and include:
 - Python version
 - Engramma version (`engramma_memory.__version__`)
 - Minimal reproducible example
