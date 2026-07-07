@@ -1,0 +1,77 @@
+site_name: Engramma Memory
+site_url: https://docs.engramma-memory.dev
+site_description: A composable memory engine for AI systems that learns, adapts, and reasons.
+repo_url: https://github.com/engramma-memory/engramma-memory
+repo_name: engramma-memory/engramma-memory
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+    - content.code.annotate
+    - search.highlight
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - 5-Minute Quickstart: getting-started/quickstart.md
+  - Guides:
+    - Engramma vs Vector Databases: guides/engramma-vs-vectordbs.md
+    - Building a Chatbot with Memory: guides/chatbot-memory.md
+    - Migrating to Engramma Cloud: guides/migrating-to-cloud.md
+  - Cloud Features:
+    - Overview (Phases 1-10): cloud/overview.md
+    - Async API: cloud/async.md
+  - Integrations:
+    - LangChain: integrations/langchain.md
+    - LlamaIndex: integrations/llamaindex.md
+    - OpenAI Assistants: integrations/openai-assistants.md
+    - CrewAI: integrations/crewai.md
+    - FastAPI: integrations/fastapi.md
+  - API Reference: api-reference.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/engramma-memory/engramma-memory
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/engramma-memory/

@@ -1,0 +1,79 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "engramma-memory"
+version = "0.1.0"
+description = "A composable memory engine for AI systems that learns, adapts, and reasons - not just retrieves."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    { name = "Engramma Team" },
+]
+keywords = ["memory", "ai", "neural", "composition", "retrieval", "llm", "agents"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.21.0",
+]
+
+[project.optional-dependencies]
+cloud = ["httpx>=0.24.0"]
+langchain = ["langchain-core>=0.1.0"]
+llamaindex = ["llama-index-core>=0.10.0"]
+openai = ["openai>=1.0.0"]
+crewai = ["crewai>=0.1.0"]
+fastapi = ["fastapi>=0.100.0"]
+all = [
+    "httpx>=0.24.0",
+    "langchain-core>=0.1.0",
+    "llama-index-core>=0.10.0",
+    "openai>=1.0.0",
+    "crewai>=0.1.0",
+    "fastapi>=0.100.0",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.4.0",
+    "mypy>=1.0",
+]
+docs = [
+    "mkdocs-material>=9.0",
+    "pymdown-extensions>=10.0",
+]
+
+[project.urls]
+Homepage = "https://engramma-memory.dev"
+Documentation = "https://docs.engramma-memory.dev"
+Repository = "https://github.com/engramma-memory/engramma-memory"
+Issues = "https://github.com/engramma-memory/engramma-memory/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["engramma_memory"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
